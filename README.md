@@ -1,0 +1,111 @@
+# aisdk/azure
+
+Official Azure OpenAI provider for the framework-agnostic PHP AI SDK, with text, streaming, image, and speech generation.
+
+## Installation
+
+```bash
+composer require aisdk/azure
+```
+
+## Basic Usage
+
+```php
+use AiSdk\Azure;
+use AiSdk\Generate;
+
+$result = Generate::text()
+    ->model(Azure::model('gpt-4o'))
+    ->instructions('Write short, clear answers.')
+    ->prompt('Explain closures in PHP.')
+    ->run();
+
+echo $result->text();
+```
+
+The identifier passed to `Azure::model()`, `Azure::image()`, or `Azure::speech()` is the Azure deployment name. It does not have to match the underlying model name.
+
+Deployment names pass through unchanged and do not need to be registered. This package does not ship a model inventory; the SDK performs internal adapter validation before Azure validates support for the selected deployment.
+
+## Image and speech generation
+
+```php
+$image = Generate::image('A product photo on a white background')
+    ->model(Azure::image('my-image-deployment'))
+    ->size('1024x1024')
+    ->run();
+
+$speech = Generate::speech('Welcome to our application.')
+    ->model(Azure::speech('my-speech-deployment'))
+    ->voice('alloy')
+    ->run();
+```
+
+## Streaming
+
+```php
+use AiSdk\Azure;
+use AiSdk\Generate;
+
+foreach (Generate::text('Tell me a story.')->model(Azure::model('gpt-4o'))->stream()->chunks() as $chunk) {
+    echo $chunk;
+}
+```
+
+## Configuration
+
+Azure OpenAI resolves the endpoint from either a resource name or an explicit base URL.
+
+| Variable | Description | Default |
+|---|---|---|
+| `AZURE_OPENAI_API_KEY` | API key authentication | — |
+| `AZURE_OPENAI_AD_TOKEN` | Microsoft Entra ID (Azure AD) bearer token | — |
+| `AZURE_RESOURCE_NAME` | Azure OpenAI resource name | — |
+| `AZURE_OPENAI_BASE_URL` | Resource endpoint (`https://{resource}.openai.azure.com`); `/openai` and `/openai/v1` suffixes are normalized | — |
+
+```php
+Azure::create([
+    'apiKey' => 'azure-...',
+    'resourceName' => 'my-resource',
+    'apiVersion' => '2024-10-21', // Used only by classic deployment URLs.
+    // Set to true to use classic deployment-based URLs.
+    'useDeploymentBasedUrls' => false,
+]);
+```
+
+## Authentication
+
+Azure OpenAI accepts an API key **or** Microsoft Entra ID (Azure AD).
+
+```php
+// API key
+Azure::create(['apiKey' => 'azure-...', 'resourceName' => 'my-resource']);
+
+// Static Entra ID token
+Azure::create(['entraToken' => $token, 'resourceName' => 'my-resource']);
+
+// Entra ID token provider (refreshed per request) — plug in MSAL / azure-identity
+Azure::create([
+    'resourceName' => 'my-resource',
+    'tokenProvider' => fn (): string => $credential->getToken('https://cognitiveservices.azure.com/.default'),
+]);
+```
+
+The current Azure `/openai/v1` API is the default and does not send an `api-version` query parameter. Set `useDeploymentBasedUrls` to `true` only for a classic deployment URL that still requires one.
+
+## Reasoning
+
+```php
+use AiSdk\Reasoning;
+
+$result = Generate::text('Explain the tradeoff.')
+    ->model(Azure::model('o3-mini'))
+    ->reasoning(Reasoning::effort('low'))
+    ->run();
+```
+
+## Testing
+
+```bash
+composer test
+```

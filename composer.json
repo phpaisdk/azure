@@ -1,0 +1,61 @@
+{
+    "name": "aisdk/azure",
+    "description": "Official Azure OpenAI provider for the PHP AI SDK.",
+    "license": "MIT",
+    "keywords": [
+        "ai",
+        "aisdk",
+        "azure",
+        "llm",
+        "openai",
+        "openai-compatible"
+    ],
+    "homepage": "https://github.com/phpaisdk/azure",
+    "support": {
+        "issues": "https://github.com/phpaisdk/azure/issues",
+        "source": "https://github.com/phpaisdk/azure"
+    },
+    "require": {
+        "php": "^8.3",
+        "aisdk/core": "^0.4",
+        "aisdk/openai-compatible": "^0.4"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.18",
+        "nyholm/psr7": "^1.8",
+        "pestphp/pest": "^3.0 || ^4.0",
+        "phpstan/phpstan": "^2.0",
+        "rector/rector": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AiSdk\\": "src/Root/",
+            "AiSdk\\Azure\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AiSdk\\Azure\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "lint": "vendor/bin/pint --test",
+        "format": "vendor/bin/pint",
+        "analyze": "vendor/bin/phpstan analyze --memory-limit=512M",
+        "refactor:dry": "vendor/bin/rector process --dry-run",
+        "refactor": "vendor/bin/rector process",
+        "test": "pest",
+        "test:all": [
+            "@lint",
+            "@analyze",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    }
+}
