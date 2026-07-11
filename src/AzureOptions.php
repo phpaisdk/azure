@@ -111,6 +111,25 @@ final class AzureOptions
         return array_merge(['api-key' => (string) $this->apiKey], $this->headers);
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function embeddingAuthHeaders(): array
+    {
+        if ($this->useDeploymentBasedUrls) {
+            return $this->authHeaders();
+        }
+
+        if ($this->apiKey === null) {
+            throw new InvalidArgumentException(
+                'Azure OpenAI v1 embeddings require apiKey / AZURE_OPENAI_API_KEY authentication.',
+                ['provider' => self::PROVIDER_NAME],
+            );
+        }
+
+        return array_merge(['api-key' => $this->apiKey], $this->headers);
+    }
+
     public function chatCompletionsUrl(string $deploymentId): string
     {
         return $this->operationUrl($deploymentId, 'chat/completions');
@@ -124,6 +143,11 @@ final class AzureOptions
     public function speechUrl(string $deploymentId): string
     {
         return $this->operationUrl($deploymentId, 'audio/speech');
+    }
+
+    public function embeddingsUrl(string $deploymentId): string
+    {
+        return $this->operationUrl($deploymentId, 'embeddings');
     }
 
     private function operationUrl(string $deploymentId, string $path): string

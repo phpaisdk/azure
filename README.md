@@ -1,6 +1,6 @@
 # aisdk/azure
 
-Official Azure OpenAI provider for the framework-agnostic PHP AI SDK, with text, streaming, image, and speech generation.
+Official Azure OpenAI provider for the framework-agnostic PHP AI SDK, with text, streaming, image, speech, and embedding generation.
 
 ## Installation
 
@@ -23,7 +23,7 @@ $result = Generate::text()
 echo $result->text();
 ```
 
-The identifier passed to `Azure::model()`, `Azure::image()`, or `Azure::speech()` is the Azure deployment name. It does not have to match the underlying model name.
+The identifier passed to `Azure::model()`, `Azure::image()`, `Azure::speech()`, or `Azure::embedding()` is the Azure deployment name. It does not have to match the underlying model name.
 
 Deployment names pass through unchanged and do not need to be registered. This package does not ship a model inventory; the SDK performs internal adapter validation before Azure validates support for the selected deployment.
 
@@ -40,6 +40,23 @@ $speech = Generate::speech('Welcome to our application.')
     ->voice('alloy')
     ->run();
 ```
+
+## Embeddings
+
+```php
+use AiSdk\Azure;
+use AiSdk\Generate;
+
+$result = Generate::embedding(['Search query', 'Document text'])
+    ->model(Azure::embedding('my-embedding-deployment'))
+    ->dimensions(512)
+    ->providerOptions('azure', ['user' => 'user-123'])
+    ->run();
+
+$vector = $result->output->vector;
+```
+
+The default Azure `/openai/v1/embeddings` endpoint sends the deployment name in the request's `model` field. When `useDeploymentBasedUrls` is enabled, the same identifier is placed in the classic `/deployments/{deployment}/embeddings` URL.
 
 ## Streaming
 
@@ -75,7 +92,7 @@ Azure::create([
 
 ## Authentication
 
-Azure OpenAI accepts an API key **or** Microsoft Entra ID (Azure AD).
+Azure OpenAI accepts an API key **or** Microsoft Entra ID (Azure AD) where the selected endpoint supports it. Microsoft's current embeddings guide documents API-key authentication for the Azure `/openai/v1/embeddings` endpoint, so configure `apiKey` for those requests.
 
 ```php
 // API key
@@ -109,3 +126,8 @@ $result = Generate::text('Explain the tradeoff.')
 ```bash
 composer test
 ```
+
+## Links
+
+- [Azure OpenAI Embeddings](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/embeddings)
+- [Core Package](https://github.com/phpaisdk/core)

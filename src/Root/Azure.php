@@ -6,6 +6,7 @@ namespace AiSdk;
 
 use AiSdk\Azure\AzureOptions;
 use AiSdk\Azure\AzureProvider;
+use AiSdk\Contracts\EmbeddingModelInterface;
 use AiSdk\Contracts\ImageModelInterface;
 use AiSdk\Contracts\SpeechModelInterface;
 use AiSdk\Contracts\TextModelInterface;
@@ -45,5 +46,10 @@ final class Azure
     public static function speech(string $modelId): SpeechModelInterface
     {
         return self::default()->speechModel($modelId);
+    }
+
+    public static function embedding(string $modelId): EmbeddingModelInterface
+    {
+        return self::default()->embeddingModel($modelId);
     }
 }
