@@ -69,6 +69,25 @@ foreach (Generate::text('Tell me a story.')->model(Azure::model('gpt-4o'))->stre
 }
 ```
 
+## Text API surface
+
+Chat Completions remains the default. Azure's v1 Responses API can be selected for a provider instance or an individual request:
+
+```php
+Azure::create([
+    'apiKey' => 'azure-...',
+    'resourceName' => 'my-resource',
+    'api' => 'responses',
+]);
+
+$result = Generate::text('Explain this code.')
+    ->model(Azure::model('my-model-deployment'))
+    ->providerOptions('azure', ['api' => 'responses'])
+    ->run();
+```
+
+Supported values are `chat_completions` and `responses`. Responses requires the current `/openai/v1` endpoint and is intentionally unavailable when `useDeploymentBasedUrls` is enabled.
+
 ## Configuration
 
 Azure OpenAI resolves the endpoint from either a resource name or an explicit base URL.
@@ -76,7 +95,7 @@ Azure OpenAI resolves the endpoint from either a resource name or an explicit ba
 | Variable | Description | Default |
 |---|---|---|
 | `AZURE_OPENAI_API_KEY` | API key authentication | — |
-| `AZURE_OPENAI_AD_TOKEN` | Microsoft Entra ID (Azure AD) bearer token | — |
+| `AZURE_OPENAI_AUTH_TOKEN` / `AZURE_OPENAI_AD_TOKEN` | Microsoft Entra ID bearer token | — |
 | `AZURE_RESOURCE_NAME` | Azure OpenAI resource name | — |
 | `AZURE_OPENAI_BASE_URL` | Resource endpoint (`https://{resource}.openai.azure.com`); `/openai` and `/openai/v1` suffixes are normalized | — |
 
@@ -104,7 +123,7 @@ Azure::create(['entraToken' => $token, 'resourceName' => 'my-resource']);
 // Entra ID token provider (refreshed per request) — plug in MSAL / azure-identity
 Azure::create([
     'resourceName' => 'my-resource',
-    'tokenProvider' => fn (): string => $credential->getToken('https://cognitiveservices.azure.com/.default'),
+    'tokenProvider' => fn (): string => $credential->getToken('https://ai.azure.com/.default'),
 ]);
 ```
 
@@ -130,4 +149,5 @@ composer test
 ## Links
 
 - [Azure OpenAI Embeddings](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/embeddings)
+- [Azure OpenAI Responses API](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/responses)
 - [Core Package](https://github.com/phpaisdk/core)

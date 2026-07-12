@@ -22,6 +22,7 @@ final class AzureOptions
     public function __construct(
         public readonly ?string $apiKey,
         public readonly string $apiVersion,
+        public readonly AzureApi $api,
         public readonly bool $useDeploymentBasedUrls,
         public readonly string $endpoint,
         public readonly ?string $entraToken = null,
@@ -41,7 +42,8 @@ final class AzureOptions
 
         $entraToken = isset($config['entraToken']) ? (string) $config['entraToken'] : null;
         if ($entraToken === null || $entraToken === '') {
-            $entraToken = Env::loadOptionalSetting(null, 'AZURE_OPENAI_AD_TOKEN');
+            $entraToken = Env::loadOptionalSetting(null, 'AZURE_OPENAI_AUTH_TOKEN')
+                ?? Env::loadOptionalSetting(null, 'AZURE_OPENAI_AD_TOKEN');
         }
         $entraToken = ($entraToken !== null && $entraToken !== '') ? $entraToken : null;
 
@@ -59,6 +61,7 @@ final class AzureOptions
         $apiVersion = isset($config['apiVersion']) && is_string($config['apiVersion']) && $config['apiVersion'] !== ''
             ? $config['apiVersion']
             : self::DEFAULT_API_VERSION;
+        $api = AzureApi::resolve($config['api'] ?? null);
 
         $useDeployment = isset($config['useDeploymentBasedUrls']) && (bool) $config['useDeploymentBasedUrls'];
 
@@ -86,6 +89,7 @@ final class AzureOptions
         return new self(
             apiKey: $apiKey,
             apiVersion: $apiVersion,
+            api: $api,
             useDeploymentBasedUrls: $useDeployment,
             endpoint: $endpoint,
             entraToken: $entraToken,
@@ -133,6 +137,18 @@ final class AzureOptions
     public function chatCompletionsUrl(string $deploymentId): string
     {
         return $this->operationUrl($deploymentId, 'chat/completions');
+    }
+
+    public function responsesUrl(): string
+    {
+        if ($this->useDeploymentBasedUrls) {
+            throw new InvalidArgumentException(
+                'Azure Responses requires the v1 endpoint and cannot be used with deployment-based URLs.',
+                ['provider' => self::PROVIDER_NAME],
+            );
+        }
+
+        return $this->endpoint . '/openai/v1/responses';
     }
 
     public function imageGenerationsUrl(string $deploymentId): string

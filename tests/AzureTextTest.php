@@ -138,3 +138,54 @@ it('accepts arbitrary Azure deployment names', function () {
     expect(Azure::model('team-chat-deployment')->modelId())->toBe('team-chat-deployment')
         ->and(Azure::model('team-reasoning-deployment')->modelId())->toBe('team-reasoning-deployment');
 });
+
+it('generates text through the Azure Responses API', function () {
+    $client = new FakeHttpClient(200, json_encode([
+        'id' => 'resp_azure',
+        'status' => 'completed',
+        'model' => 'gpt-4.1',
+        'output' => [[
+            'type' => 'message',
+            'content' => [['type' => 'output_text', 'text' => 'Hello from Responses']],
+        ]],
+        'usage' => ['input_tokens' => 4, 'output_tokens' => 3, 'total_tokens' => 7],
+    ]));
+    configureAzureWith($client);
+    Azure::create(['apiKey' => 'azure-test', 'resourceName' => 'my-resource', 'api' => 'responses']);
+
+    $result = Generate::text('Hi')->model(Azure::model('gpt-4.1'))->run();
+
+    expect($result->text)->toBe('Hello from Responses')
+        ->and($client->lastRequest->getUri()->getPath())->toBe('/openai/v1/responses')
+        ->and($client->sentBody())->toHaveKey('input')->not->toHaveKeys(['messages', 'api']);
+});
+
+it('allows per-request Azure API selection', function () {
+    $client = new FakeHttpClient(200, json_encode([
+        'id' => 'resp_azure',
+        'status' => 'completed',
+        'output' => [['type' => 'message', 'content' => [['type' => 'output_text', 'text' => 'Done']]]],
+    ]));
+    configureAzureWith($client);
+    Azure::create(['apiKey' => 'azure-test', 'resourceName' => 'my-resource']);
+
+    Generate::text('Hi')
+        ->model(Azure::model('gpt-4.1'))
+        ->providerOptions('azure', ['api' => 'responses'])
+        ->run();
+
+    expect($client->lastRequest->getUri()->getPath())->toBe('/openai/v1/responses');
+});
+
+it('rejects Responses with classic deployment URLs', function () {
+    $client = new FakeHttpClient(200, '{}');
+    configureAzureWith($client);
+    Azure::create([
+        'apiKey' => 'azure-test',
+        'resourceName' => 'my-resource',
+        'api' => 'responses',
+        'useDeploymentBasedUrls' => true,
+    ]);
+
+    Generate::text('Hi')->model(Azure::model('gpt-4.1'))->run();
+})->throws(InvalidArgumentException::class, 'Azure Responses requires the v1 endpoint');
