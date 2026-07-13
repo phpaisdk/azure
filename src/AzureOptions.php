@@ -161,6 +161,11 @@ final class AzureOptions
         return $this->operationUrl($deploymentId, 'audio/speech');
     }
 
+    public function transcriptionUrl(string $deploymentId): string
+    {
+        return $this->operationUrl($deploymentId, 'audio/transcriptions');
+    }
+
     public function embeddingsUrl(string $deploymentId): string
     {
         return $this->operationUrl($deploymentId, 'embeddings');

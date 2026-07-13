@@ -1,6 +1,6 @@
 # aisdk/azure
 
-Official Azure OpenAI provider for the framework-agnostic PHP AI SDK, with text, streaming, image, speech, and embedding generation.
+Official Azure OpenAI provider for the framework-agnostic PHP AI SDK, with text, streaming, image, speech, transcription, and embedding generation.
 
 ## Installation
 
@@ -23,7 +23,7 @@ $result = Generate::text()
 echo $result->text();
 ```
 
-The identifier passed to `Azure::model()`, `Azure::image()`, `Azure::speech()`, or `Azure::embedding()` is the Azure deployment name. It does not have to match the underlying model name.
+The identifier passed to `Azure::model()`, `Azure::image()`, `Azure::speech()`, `Azure::transcription()`, or `Azure::embedding()` is the Azure deployment name. It does not have to match the underlying model name.
 
 Deployment names pass through unchanged and do not need to be registered. This package does not ship a model inventory; the SDK performs internal adapter validation before Azure validates support for the selected deployment.
 
@@ -40,6 +40,22 @@ $speech = Generate::speech('Welcome to our application.')
     ->voice('alloy')
     ->run();
 ```
+
+## Transcription
+
+```php
+use AiSdk\Azure;
+use AiSdk\Content;
+use AiSdk\Generate;
+
+$result = Generate::transcription(Content::audio(__DIR__.'/meeting.mp3'))
+    ->model(Azure::transcription('my-transcription-deployment'))
+    ->run();
+
+echo $result->output->text;
+```
+
+The default Azure v1 surface uses `/openai/v1/audio/transcriptions`. With `useDeploymentBasedUrls`, the adapter uses the classic deployment URL and configured API version.
 
 ## Embeddings
 
@@ -150,4 +166,5 @@ composer test
 
 - [Azure OpenAI Embeddings](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/embeddings)
 - [Azure OpenAI Responses API](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/responses)
+- [Azure OpenAI Transcriptions API](https://learn.microsoft.com/en-us/azure/foundry/openai/reference#transcriptions---create)
 - [Core Package](https://github.com/phpaisdk/core)

@@ -10,6 +10,7 @@ use AiSdk\Contracts\EmbeddingModelInterface;
 use AiSdk\Contracts\ImageModelInterface;
 use AiSdk\Contracts\SpeechModelInterface;
 use AiSdk\Contracts\TextModelInterface;
+use AiSdk\Contracts\TranscriptionModelInterface;
 
 final class Azure
 {
@@ -46,6 +47,11 @@ final class Azure
     public static function speech(string $modelId): SpeechModelInterface
     {
         return self::default()->speechModel($modelId);
+    }
+
+    public static function transcription(string $modelId): TranscriptionModelInterface
+    {
+        return self::default()->transcriptionModel($modelId);
     }
 
     public static function embedding(string $modelId): EmbeddingModelInterface
