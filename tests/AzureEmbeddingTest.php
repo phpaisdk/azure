@@ -29,7 +29,7 @@ it('generates embeddings through an Azure deployment URL', function () {
     ]);
 
     $result = Generate::embedding('A document')
-        ->model(Azure::embedding('embedding-deployment'))
+        ->model(Azure::model('embedding-deployment'))
         ->dimensions(512)
         ->run();
 
@@ -51,7 +51,7 @@ it('uses the Azure v1 embedding URL when deployment URLs are disabled', function
     Generate::configure(new Sdk($client, $factory, $factory));
     Azure::create(['apiKey' => 'azure-test', 'baseUrl' => 'https://example.openai.azure.com/openai/v1']);
 
-    Generate::embedding('A document')->model(Azure::embedding('text-embedding-3-small'))->run();
+    Generate::embedding('A document')->model(Azure::model('text-embedding-3-small'))->run();
 
     expect((string) $client->lastRequest?->getUri())->toBe('https://example.openai.azure.com/openai/v1/embeddings');
 });
@@ -66,7 +66,7 @@ it('requires API key authentication for Azure v1 embeddings', function () {
     ]);
 
     expect(fn() => Generate::embedding('A document')
-        ->model(Azure::embedding('text-embedding-3-small'))
+        ->model(Azure::model('text-embedding-3-small'))
         ->run())
         ->toThrow(\AiSdk\Exceptions\InvalidArgumentException::class, 'v1 embeddings require apiKey')
         ->and($client->lastRequest)->toBeNull();
@@ -85,7 +85,7 @@ it('uses the API key for Azure v1 embeddings when Entra is also configured', fun
     ]);
 
     Generate::embedding('A document')
-        ->model(Azure::embedding('text-embedding-3-small'))
+        ->model(Azure::model('text-embedding-3-small'))
         ->run();
 
     expect($client->lastRequest?->getHeaderLine('api-key'))->toBe('azure-test')

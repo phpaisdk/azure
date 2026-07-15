@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AiSdk\Azure;
 
 use AiSdk\Exceptions\InvalidArgumentException;
+use AiSdk\Live\LiveOperation;
 use AiSdk\Support\Sdk;
 use AiSdk\Utils\Support\Env;
 use AiSdk\Utils\Support\Url;
@@ -171,6 +172,37 @@ final class AzureOptions
         return $this->operationUrl($deploymentId, 'embeddings');
     }
 
+    public function liveWebSocketUrl(string $deploymentId, LiveOperation $operation): string
+    {
+        $endpoint = $this->webSocketEndpoint();
+
+        return match ($operation) {
+            LiveOperation::Voice => $endpoint . '/openai/v1/realtime?model=' . rawurlencode($deploymentId),
+            LiveOperation::Transcribe => $endpoint . '/openai/v1/realtime?intent=transcription',
+            LiveOperation::Translate => $endpoint . '/openai/v1/realtime/translations?model=' . rawurlencode($deploymentId),
+        };
+    }
+
+    public function liveClientSecretsUrl(): string
+    {
+        return $this->endpoint . '/openai/v1/realtime/client_secrets';
+    }
+
+    public function liveCallsUrl(): string
+    {
+        return $this->endpoint . '/openai/v1/realtime/calls';
+    }
+
+    public function liveCallActionUrl(string $callId, string $action): string
+    {
+        return $this->liveCallsUrl() . '/' . rawurlencode($callId) . '/' . rawurlencode($action);
+    }
+
+    public function liveCallWebSocketUrl(string $callId): string
+    {
+        return $this->webSocketEndpoint() . '/openai/v1/realtime?call_id=' . rawurlencode($callId);
+    }
+
     private function operationUrl(string $deploymentId, string $path): string
     {
         $path = ltrim($path, '/');
@@ -189,5 +221,12 @@ final class AzureOptions
         $endpoint = Url::withoutTrailingSlash($endpoint);
 
         return (string) preg_replace('#/openai(?:/v1)?$#', '', $endpoint);
+    }
+
+    private function webSocketEndpoint(): string
+    {
+        $endpoint = preg_replace('#^https://#', 'wss://', $this->endpoint);
+
+        return is_string($endpoint) ? $endpoint : $this->endpoint;
     }
 }

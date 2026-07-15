@@ -6,11 +6,8 @@ namespace AiSdk;
 
 use AiSdk\Azure\AzureOptions;
 use AiSdk\Azure\AzureProvider;
-use AiSdk\Contracts\EmbeddingModelInterface;
-use AiSdk\Contracts\ImageModelInterface;
-use AiSdk\Contracts\SpeechModelInterface;
-use AiSdk\Contracts\TextModelInterface;
-use AiSdk\Contracts\TranscriptionModelInterface;
+use AiSdk\Azure\Webhooks\AzureWebhookVerifier;
+use AiSdk\Contracts\Model;
 
 final class Azure
 {
@@ -34,28 +31,19 @@ final class Azure
         self::$default = null;
     }
 
-    public static function model(string $modelId): TextModelInterface
+    public static function model(string $modelId): Model
     {
-        return self::default()->textModel($modelId);
+        return self::default()->model($modelId);
     }
 
-    public static function image(string $modelId): ImageModelInterface
+    /**
+     * Verify and decode an Azure OpenAI webhook from its exact raw request body.
+     *
+     * @param  array<string, string|list<string>>  $headers
+     * @return array<string, mixed>
+     */
+    public static function verifyWebhook(string $payload, array $headers, string $signingSecret): array
     {
-        return self::default()->imageModel($modelId);
-    }
-
-    public static function speech(string $modelId): SpeechModelInterface
-    {
-        return self::default()->speechModel($modelId);
-    }
-
-    public static function transcription(string $modelId): TranscriptionModelInterface
-    {
-        return self::default()->transcriptionModel($modelId);
-    }
-
-    public static function embedding(string $modelId): EmbeddingModelInterface
-    {
-        return self::default()->embeddingModel($modelId);
+        return AzureWebhookVerifier::verify($payload, $headers, $signingSecret);
     }
 }

@@ -27,7 +27,7 @@ it('generates images through the Azure v1 endpoint', function () {
     configureAzureMediaWith($client);
 
     $result = Generate::image('A red cube')
-        ->model(Azure::image('gpt-image-1'))
+        ->model(Azure::model('gpt-image-1'))
         ->size('1024x1024')
         ->providerOptions('azure', ['background' => 'transparent'])
         ->run();
@@ -43,7 +43,7 @@ it('generates speech through the Azure v1 endpoint', function () {
     configureAzureMediaWith($client);
 
     $result = Generate::speech('Hello')
-        ->model(Azure::speech('gpt-4o-mini-tts'))
+        ->model(Azure::model('gpt-4o-mini-tts'))
         ->voice('alloy')
         ->run();
 
@@ -55,6 +55,6 @@ it('accepts arbitrary Azure deployment names for every selected modality', funct
     Azure::create(['apiKey' => 'azure-test', 'resourceName' => 'my-resource']);
 
     expect(Azure::model('team-chat-deployment')->modelId())->toBe('team-chat-deployment')
-        ->and(Azure::image('team-image-deployment')->modelId())->toBe('team-image-deployment')
-        ->and(Azure::speech('team-speech-deployment')->modelId())->toBe('team-speech-deployment');
+        ->and(Azure::model('team-image-deployment')->modelId())->toBe('team-image-deployment')
+        ->and(Azure::model('team-speech-deployment')->modelId())->toBe('team-speech-deployment');
 });

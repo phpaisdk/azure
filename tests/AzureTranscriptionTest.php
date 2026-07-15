@@ -26,7 +26,7 @@ it('uses the Azure deployment transcription endpoint', function () {
     ]);
 
     $result = Generate::transcription(Content::audio('wav', 'audio/wav', 'clip.wav'))
-        ->model(Azure::transcription('whisper-deployment'))
+        ->model(Azure::model('whisper-deployment'))
         ->run();
 
     expect($result->output->text)->toBe('Azure transcript.')
