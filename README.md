@@ -303,15 +303,13 @@ composer test
 The default suite uses protocol fixtures and conformance checks. Credentialed
 Live network verification is separate from the default test run.
 
-## Links
+## Documentation
 
-- [Azure OpenAI Embeddings](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/embeddings)
-- [Azure OpenAI Responses API](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/responses)
-- [Azure OpenAI Transcriptions API](https://learn.microsoft.com/en-us/azure/foundry/openai/reference#transcriptions---create)
-- [Azure Realtime WebSocket](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio-websockets)
-- [Azure Realtime WebRTC](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio-webrtc)
-- [Azure Realtime SIP](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio-sip)
-- [GPT Realtime Whisper](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/gpt-realtime-whisper)
-- [GPT Realtime Translate](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/gpt-realtime-translate)
-- [Azure OpenAI webhooks](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/webhooks)
-- [Core Package](https://github.com/phpaisdk/core)
+- [PHP AI SDK documentation](https://phpaisdk.com/docs)
+- [Azure documentation](https://phpaisdk.com/docs/azure)
+
+## Community
+
+- [Contributing](https://github.com/phpaisdk/.github/blob/main/CONTRIBUTING.md)
+- [Support](https://github.com/phpaisdk/.github/blob/main/SUPPORT.md)
+- For private security reports, email [security@phpaisdk.com](mailto:security@phpaisdk.com).
