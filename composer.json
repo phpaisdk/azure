@@ -17,8 +17,8 @@
     },
     "require": {
         "php": "^8.3",
-        "aisdk/core": "^0.10.0",
-        "aisdk/openai-compatible": "^0.10.0",
+        "aisdk/core": "^0.11.0",
+        "aisdk/openai-compatible": "^0.11.0",
         "standard-webhooks/standard-webhooks": "^1.0"
     },
     "require-dev": {
